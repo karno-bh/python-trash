@@ -1,6 +1,8 @@
 class FlatMatrix(object):
 
     def __init__(self, width, height, new_state=None):
+        # type: (int, int, list[int]) -> FlatMatrix
+
         self.width = width
         self.height = height
         if new_state:
@@ -9,12 +11,18 @@ class FlatMatrix(object):
             self.data = [0 for x in range(width * height)]
 
     def __idx(self, i, j):
+        # type: (int, int) -> int
+
         return j * self.width + i
 
     def get(self, i, j):
+        # type: (int, int) -> int
+
         return self.data[self.__idx(i, j)]
 
     def set(self, i, j, val, clone=True):
+        # type: (int, int, int, bool) -> FlatMatrix
+
         if clone:
             new_state = [x for x in self.data]
             new_state[self.__idx(i, j)] = val
@@ -27,6 +35,10 @@ class FlatMatrix(object):
         buf = []
         for j in range(self.height):
             for i in range(self.width):
-                buf += "%d " % self.data[self.__idx(i, j)]
+                placeholder = "%d" if i == 0 else " %d"
+                buf += placeholder % self.data[self.__idx(i, j)]
             buf += "\n"
         return ''.join(buf)
+
+
+__all__ = ['FlatMatrix']

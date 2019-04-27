@@ -22,5 +22,15 @@ def main():
     game.run()
 
 
+def test(t):
+    if t is True:
+        return 'Hello'
+    return -1
+
+
+def test_of_test():
+    j = test(False)
+
+
 if __name__ == '__main__':
     main()
