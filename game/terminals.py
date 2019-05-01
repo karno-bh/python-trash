@@ -67,7 +67,7 @@ def gainful_lines(board, expected_in_line):
     state_clone = FlatMatrix(
         board.state.width,
         board.state.height,
-        [x << indicators_length for x in board.state.data]
+        [x for x in board.state.data]
     )
     max_horizontal = state_clone.width - 1
     max_vertical = state_clone.height - 1
@@ -79,7 +79,24 @@ def gainful_lines(board, expected_in_line):
         j += 1
         if j > max_vertical:
             continue
+        for dummy_move in [RED, BLUE]:
+            state_clone.set(i, j, dummy_move, clone=False)
+            for directions in DIRECTIONS_PAIRS:
+                real_length = 1
+                heuristic_length = 1.0
+                l_dir = directions[0]
+                r_dir = directions[1]
+                l_direction_val = 1.0
+                r_direction_val = 1.0
+                while real_length != expected_in_line and (l_direction_val or r_direction_val):
+                    if l_direction_val:
 
+                        pass
+                    if r_direction_val:
+                        pass
+
+            pass
+        state_clone.set(i, j, EMPTY, clone=False)
         pass
 
 

@@ -29,10 +29,7 @@ class Board(object):
     def __init__(self, width=5, height=5, state=None):
         # type: (int, int, FlatMatrix) -> Board
 
-        if state:
-            self.state = state
-        else:
-            self.state = FlatMatrix(width, height)
+        self.state = state or FlatMatrix(width, height)
 
     def move(self, x, color, perform=True):
         state = self.state
