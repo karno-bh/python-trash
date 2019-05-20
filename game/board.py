@@ -24,6 +24,11 @@ DIRECTIONS_PAIRS = [
 ]
 
 
+def invert_direction(direction):
+    # type: (tuple[int, int]) -> tuple[int, int]
+    return -direction[0], -direction[1]
+
+
 class Board(object):
 
     def __init__(self, width=5, height=5, state=None):
@@ -50,5 +55,6 @@ class Board(object):
 __all__ = [
     'EMPTY', 'RED', 'BLUE',
     'NO_MOVE', 'NORTH', 'EAST', 'SOUTH', 'WEST', 'NE', 'SE', 'SW', 'NW', 'DIRECTIONS_PAIRS',
-    'Board'
+    'invert_direction',
+    'Board',
 ]
