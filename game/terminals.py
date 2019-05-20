@@ -1,5 +1,6 @@
 from board import *
 from flat_matrix import *
+import math
 
 
 def __walk_landscape_with_gravity(state):
@@ -70,8 +71,10 @@ def gainful_lines(board, expected_in_line):
     max_vertical = state_clone.height - 1
     result = {
         RED: {},
-        BLUE: {}
+        BLUE: {},
     }
+    height_map = [j for i, j in __walk_landscape_with_gravity(state_clone)]
+
     for i in range(state_clone.width):
         j = max_vertical
         while j != -1 and state_clone.get(i, j) == EMPTY:
@@ -79,6 +82,14 @@ def gainful_lines(board, expected_in_line):
                 for direction in DIRECTIONS_PAIRS:
                     neighbour_i = direction[0] + i
                     neighbour_j = direction[1] + j
+                    if state_clone.out_of_range(neighbour_i, neighbour_j):
+                        observed = state_clone.get(neighbour_i, neighbour_j)
+                        if observed == EMPTY:
+                            break
+
+
+
+
 
 
 
