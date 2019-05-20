@@ -21,8 +21,6 @@ def winner(board, expected_in_line):
         board.state.height,
         [x << indicators_length for x in board.state.data]
     )
-    max_horizontal = state_clone.width - 1
-    max_vertical = state_clone.height - 1
     for i, j in __walk_landscape_with_gravity(state_clone):
         if j == -1:
             continue
@@ -42,7 +40,7 @@ def winner(board, expected_in_line):
                 while True:
                     run_i += direction[0]
                     run_j += direction[1]
-                    if run_i < 0 or run_i > max_horizontal or run_j < 0 or run_j > max_vertical:
+                    if state_clone.out_of_range(run_i, run_j):
                         break
                     inspected_element = state_clone.get(run_i, run_j)
                     real_inspected_el_val = inspected_element >> indicators_length
@@ -79,8 +77,10 @@ def gainful_lines(board, expected_in_line):
         while j != -1 and state_clone.get(i, j) == EMPTY:
             for direction_pair in DIRECTIONS_PAIRS:
                 for direction in DIRECTIONS_PAIRS:
-                    neighbour_i = direction[0]
-                    neighbour_j = direction[1]
+                    neighbour_i = direction[0] + i
+                    neighbour_j = direction[1] + j
+
+
 
 
     # for i, j in __walk_landscape(state_clone):

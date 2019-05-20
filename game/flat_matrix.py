@@ -31,6 +31,11 @@ class FlatMatrix(object):
             self.data[self.__idx(i, j)] = val
             return self
 
+    def out_of_range(self, i, j):
+        max_horizontal = self.width - 1
+        max_vertical = self.height - 1
+        return i < 0 or i > max_horizontal or i < 0 or i > max_vertical
+
     def __str__(self):
         buf = []
         for j in range(self.height):
