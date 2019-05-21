@@ -56,6 +56,18 @@ def winner(board, expected_in_line):
     return EMPTY
 
 
+def __score(i, j, expected_type, state, height_map):
+    # type: (int, int, int, FlatMatrix, list[int]) -> float
+    if state.out_of_range(i, j):
+        return 0.0
+    observed = state.get(i, j)
+    if observed == expected_type:
+        return 1.0
+    if observed == EMPTY:
+        return 1.0 / math.pow(2, j - height_map[i] + 1)
+    return 0.0
+
+
 def gainful_lines(board, expected_in_line):
     """
     Gainful line is a line that can grow till the maximal number of elements
@@ -86,6 +98,45 @@ def gainful_lines(board, expected_in_line):
                         observed = state_clone.get(neighbour_i, neighbour_j)
                         if observed == EMPTY:
                             break
+                    inv_direction = invert_direction(direction)
+                    inv_neighbour_i, inv_neighbour_j = neighbour_i, neighbour_j
+                    direction_score = inv_direction_score = -1.0
+                    line_score = 1.0
+                    possible_line_length = 1
+                    while (direction_score != 0.0 and inv_direction_score != 0.0)\
+                            or possible_line_length == expected_in_line:
+                        next_neighbour_i = neighbour_i + direction[0]
+                        next_neighbour_j = neighbour_j + direction[1]
+                        next_inv_neighbour_i = inv_neighbour_i + inv_direction[0]
+                        next_inv_neighbour_j = inv_neighbour_j + inv_direction[1]
+                        score_next_neighbour = __score(
+                            next_neighbour_i,
+                            next_neighbour_j,
+                            observed,
+                            state_clone,
+                            height_map
+                        )
+                        score_next_inv_neighbour = __score(
+                            next_inv_neighbour_i,
+                            next_inv_neighbour_j,
+                            observed,
+                            state_clone,
+                            height_map
+                        )
+                        max_score = score_next_neighbour
+                        next_is_max = True
+                        if score_next_inv_neighbour > max_score:
+                            max_score = score_next_inv_neighbour
+                            next_is_max = False
+                        if next_is_max:
+                            neighbour_i = next_neighbour_i
+                            neighbour_j = next_neighbour_j
+                        else:
+                            inv_neighbour_i = next_inv_neighbour_i
+                            inv_neighbour_j = next_inv_neighbour_j
+
+
+
 
 
 
