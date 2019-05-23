@@ -92,7 +92,7 @@ def gainful_lines(board, expected_in_line):
     max_vertical = state_clone.height - 1
     result = {
         RED: {},
-        BLUE: {},
+        YELLOW: {},
     }
     height_map = [j for i, j in __walk_landscape_with_gravity(state_clone)]
 
@@ -103,38 +103,23 @@ def gainful_lines(board, expected_in_line):
                 for direction in direction_pair:
                     neighbour_i = direction[0] + i
                     neighbour_j = direction[1] + j
-                    if not state_clone.out_of_range(neighbour_i, neighbour_j):
-                        observed = state_clone.get(neighbour_i, neighbour_j)
-                        if observed == EMPTY:
-                            continue
-                    else:
+                    if state_clone.out_of_range(neighbour_i, neighbour_j):
+                        continue
+                    observed = state_clone.get(neighbour_i, neighbour_j)
+                    if observed == EMPTY:
                         continue
                     inv_direction = invert_direction(direction)
                     inv_neighbour_i, inv_neighbour_j = neighbour_i, neighbour_j
-                    line_values = [
-                        1.0 # __score(neighbour_i, neighbour_j, observed, state_clone, height_map)
-                    ]
+                    line_values = [1.0]
                     while len(line_values) != expected_in_line:
                         next_neighbour_i = neighbour_i + direction[0]
                         next_neighbour_j = neighbour_j + direction[1]
                         next_inv_neighbour_i = inv_neighbour_i + inv_direction[0]
                         next_inv_neighbour_j = inv_neighbour_j + inv_direction[1]
-                        direction_score = __score(
-                            next_neighbour_i,
-                            next_neighbour_j,
-                            observed,
-                            state_clone,
-                            height_map,
-                            expected_in_line,
-                        )
-                        inv_direction_score = __score(
-                            next_inv_neighbour_i,
-                            next_inv_neighbour_j,
-                            observed,
-                            state_clone,
-                            height_map,
-                            expected_in_line,
-                        )
+                        direction_score = __score(next_neighbour_i, next_neighbour_j, observed,
+                                                  state_clone, height_map, expected_in_line)
+                        inv_direction_score = __score(next_inv_neighbour_i, next_inv_neighbour_j, observed,
+                                                      state_clone, height_map, expected_in_line)
                         if direction_score == 0.0 and inv_direction_score == 0.0:
                             break
 
@@ -215,7 +200,7 @@ def __text_gainful_lines():
     lines = gainful_lines(b, 4)
     print lines
     from_gainful_lines_score = score_from_gainful_lines(lines)
-    print score_from_gainful_lines(lines)
+    print from_gainful_lines_score
 
 
 if __name__ == '__main__':

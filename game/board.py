@@ -2,7 +2,13 @@ from flat_matrix import FlatMatrix
 
 EMPTY = 0
 RED = 1
-BLUE = 3
+YELLOW = 3
+
+COLOR_NAMES = {
+    EMPTY: 'Empty',
+    RED: 'Red',
+    YELLOW: 'Yellow',
+}
 
 # lower left corner is (0, 0) of board coordinate
 # i.e. the board grows to north
@@ -31,7 +37,7 @@ def invert_direction(direction):
 
 class Board(object):
 
-    def __init__(self, width=5, height=5, state=None):
+    def __init__(self, width=7, height=6, state=None):
         # type: (int, int, FlatMatrix) -> Board
 
         self.state = state or FlatMatrix(width, height)
@@ -41,19 +47,16 @@ class Board(object):
         if x < state.height and state.get(x, state.height - 1) == EMPTY:
             if perform:
                 y = state.height - 1
-                while state.get(x, y) != EMPTY or y < 0:
+                while state.get(x, y) == EMPTY and y >= 0:
                     y -= 1
                 y += 1
                 return state.set(x, y, color)
             return True
         return None if perform else False
 
-    def run_terminal(self, terminal):
-        return terminal(self)
-
 
 __all__ = [
-    'EMPTY', 'RED', 'BLUE',
+    'EMPTY', 'RED', 'YELLOW', 'COLOR_NAMES',
     'NO_MOVE', 'NORTH', 'EAST', 'SOUTH', 'WEST', 'NE', 'SE', 'SW', 'NW', 'DIRECTIONS_PAIRS',
     'invert_direction',
     'Board',
