@@ -56,19 +56,28 @@ def winner(board, expected_in_line):
     return EMPTY
 
 
-def __score(i, j, expected_type, state, height_map):
-    # type: (int, int, int, FlatMatrix, list[int]) -> float
+def __score(i, j, expected_type, state, height_map, expected_in_line):
+    # type: (int, int, int, FlatMatrix, list[int], int) -> float
     if state.out_of_range(i, j):
         return 0.0
     observed = state.get(i, j)
     if observed == expected_type:
         return 1.0
     if observed == EMPTY:
-        return 1.0 / math.pow(2, j - height_map[i] + 1)
+        return 1.0 / math.pow(expected_in_line, j - height_map[i])
     return 0.0
 
 
+def __construct_key(i1, j1, i2, j2):
+    # type: (int, int, int, int) -> str
+    if (i1 != i2 and i2 < i1) or j2 < j1:
+        i1, i2 = i2, i1
+        j1, j2 = j2, j1
+    return "{0}_{1}__{2}_{3}".format(i1, j1, i2, j2)
+
+
 def gainful_lines(board, expected_in_line):
+    # type: (Board, int) -> dict[int, dict[str, list[float]]]
     """
     Gainful line is a line that can grow till the maximal number of elements
     :rtype: Dict
@@ -91,83 +100,74 @@ def gainful_lines(board, expected_in_line):
         j = max_vertical
         while j != -1 and state_clone.get(i, j) == EMPTY:
             for direction_pair in DIRECTIONS_PAIRS:
-                for direction in DIRECTIONS_PAIRS:
+                for direction in direction_pair:
                     neighbour_i = direction[0] + i
                     neighbour_j = direction[1] + j
-                    if state_clone.out_of_range(neighbour_i, neighbour_j):
+                    if not state_clone.out_of_range(neighbour_i, neighbour_j):
                         observed = state_clone.get(neighbour_i, neighbour_j)
                         if observed == EMPTY:
-                            break
+                            continue
+                    else:
+                        continue
                     inv_direction = invert_direction(direction)
                     inv_neighbour_i, inv_neighbour_j = neighbour_i, neighbour_j
-                    direction_score = inv_direction_score = -1.0
-                    line_score = 1.0
-                    possible_line_length = 1
-                    while (direction_score != 0.0 and inv_direction_score != 0.0)\
-                            or possible_line_length == expected_in_line:
+                    line_values = [
+                        1.0 # __score(neighbour_i, neighbour_j, observed, state_clone, height_map)
+                    ]
+                    while len(line_values) != expected_in_line:
                         next_neighbour_i = neighbour_i + direction[0]
                         next_neighbour_j = neighbour_j + direction[1]
                         next_inv_neighbour_i = inv_neighbour_i + inv_direction[0]
                         next_inv_neighbour_j = inv_neighbour_j + inv_direction[1]
-                        score_next_neighbour = __score(
+                        direction_score = __score(
                             next_neighbour_i,
                             next_neighbour_j,
                             observed,
                             state_clone,
-                            height_map
+                            height_map,
+                            expected_in_line,
                         )
-                        score_next_inv_neighbour = __score(
+                        inv_direction_score = __score(
                             next_inv_neighbour_i,
                             next_inv_neighbour_j,
                             observed,
                             state_clone,
-                            height_map
+                            height_map,
+                            expected_in_line,
                         )
-                        max_score = score_next_neighbour
-                        next_is_max = True
-                        if score_next_inv_neighbour > max_score:
-                            max_score = score_next_inv_neighbour
-                            next_is_max = False
-                        if next_is_max:
-                            neighbour_i = next_neighbour_i
-                            neighbour_j = next_neighbour_j
-                        else:
+                        if direction_score == 0.0 and inv_direction_score == 0.0:
+                            break
+
+                        max_score = direction_score
+                        if inv_direction_score > max_score:
+                            max_score = inv_direction_score
                             inv_neighbour_i = next_inv_neighbour_i
                             inv_neighbour_j = next_inv_neighbour_j
+                        else:
+                            neighbour_i = next_neighbour_i
+                            neighbour_j = next_neighbour_j
+                        line_values.append(max_score)
+
+                    if len(line_values) == expected_in_line:
+                        values = result[observed]
+                        key = __construct_key(neighbour_i, neighbour_j, inv_neighbour_i, inv_neighbour_j)
+                        if key not in values:
+                            values[key] = line_values
+            j -= 1
+
+    return result
 
 
-
-
-
-
-
-
-
-
-
-    # for i, j in __walk_landscape(state_clone):
-    #     j += 1
-    #     if j > max_vertical:
-    #         continue
-    #     for dummy_move in [RED, BLUE]:
-    #         state_clone.set(i, j, dummy_move, clone=False)
-    #         for directions in DIRECTIONS_PAIRS:
-    #             real_length = 1
-    #             heuristic_length = 1.0
-    #             l_dir = directions[0]
-    #             r_dir = directions[1]
-    #             l_direction_val = 1.0
-    #             r_direction_val = 1.0
-    #             while real_length != expected_in_line and (l_direction_val or r_direction_val):
-    #                 if l_direction_val:
-    #
-    #                     pass
-    #                 if r_direction_val:
-    #                     pass
-    #
-    #         pass
-    #     state_clone.set(i, j, EMPTY, clone=False)
-    #     pass
+def score_from_gainful_lines(lines_per_player):
+    # type: (dict[int, dict[str, list[float]]]) -> dict[int, float]
+    result = {}
+    for player, player_lines in lines_per_player.iteritems():
+        player_result = 0.0
+        for line_coord, line_values in player_lines.iteritems():
+            line_sum = sum(line_values)
+            player_result += math.pow(line_sum, 2)
+        result[player] = player_result
+    return result
 
 
 def __test_walk_landscape():
@@ -202,6 +202,23 @@ def __test_win_state():
     print v1
 
 
+def __text_gainful_lines():
+    data1 = [
+        1, 0, 1, 1,
+        1, 0, 1, 3,
+        1, 0, 0, 3,
+        0, 0, 0, 0,
+    ]
+    m = FlatMatrix(4, 4, data1)
+    print m
+    b = Board(4,4,m)
+    lines = gainful_lines(b, 4)
+    print lines
+    from_gainful_lines_score = score_from_gainful_lines(lines)
+    print score_from_gainful_lines(lines)
+
+
 if __name__ == '__main__':
     # __test_walk_landscape()
-    __test_win_state()
+    # __test_win_state()
+    __text_gainful_lines()
