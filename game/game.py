@@ -12,6 +12,8 @@ def game(players, expected_in_line):
         print board.state
         win = winner(board, expected_in_line)
         print win
+        if win != 0:
+            break
         gain_lines = gainful_lines(board, expected_in_line)
         # print gain_lines
         score = score_from_gainful_lines(gain_lines)
