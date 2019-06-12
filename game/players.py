@@ -85,40 +85,6 @@ class MiniMaxPlayer(Player):
                 beta = min(beta, val)
             if alpha > beta:
                 break
-        # if max_player:
-        #     val = float('-inf')
-        #     for index in playing_indexes:
-        #         column, row = height_map[index]
-        #         if row == board.state.height:
-        #             continue
-        #         moved_state = board.move(column, playing_for)
-        #         moved_board = Board(state=moved_state)
-        #         child_score = self.__min_max_move(moved_board, opponent(playing_for), alpha, beta, current_depth + 1, column)[0]
-        #         if child_score > val:
-        #             val = child_score
-        #             ret_column = column
-        #         # print "Max player \n{0} val {1} \n=======".format(moved_state, val)
-        #         alpha = max(alpha, val)
-        #         if alpha > beta:
-        #             # print "pruned in max"
-        #             break
-        # else:
-        #     val = float('+inf')
-        #     for index in playing_indexes:
-        #         column, row = height_map[index]
-        #         if row == board.state.height:
-        #             continue
-        #         moved_state = board.move(column, playing_for)
-        #         moved_board = Board(state=moved_state)
-        #         child_score = self.__min_max_move(moved_board, opponent(playing_for), alpha, beta, current_depth + 1, column)[0]
-        #         if child_score < val:
-        #             val = child_score
-        #             ret_column = column
-        #         # print "Min player \n{0} val {1} \n=======".format(moved_state, val)
-        #         beta = min(beta, val)
-        #         if alpha > beta:
-        #             # print "pruned in min"
-        #             break
         return val, ret_column
 
 
