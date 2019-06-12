@@ -45,5 +45,14 @@ class FlatMatrix(object):
             buf += "\n"
         return ''.join(buf)
 
+    def pretty_log(self, replace):
+        buf = []
+        for j in range(self.height - 1, -1, -1):
+            for i in range(self.width):
+                placeholder = "{0}" if i == 0 else " {0}"
+                buf += placeholder.format(replace[self.data[self.__idx(i, j)]])
+            buf += "\n"
+        return ''.join(buf)
+
 
 __all__ = ['FlatMatrix']

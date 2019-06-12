@@ -3,7 +3,7 @@ from flat_matrix import *
 import math
 
 
-def __walk_landscape_with_gravity(state):
+def walk_landscape_with_gravity(state):
     # type: (FlatMatrix) -> Generator[Tuple[int, int], None, None]
     for i in range(state.width):
         # TODO j should not start from the maximal height. The maximal height should be specified in board
@@ -22,7 +22,7 @@ def winner(board, expected_in_line):
         board.state.height,
         [x << indicators_length for x in board.state.data]
     )
-    for i, j in __walk_landscape_with_gravity(state_clone):
+    for i, j in walk_landscape_with_gravity(state_clone):
         if j == -1:
             continue
         start_val = state_clone.get(i, j)
@@ -94,7 +94,7 @@ def gainful_lines(board, expected_in_line):
         RED: {},
         YELLOW: {},
     }
-    height_map = [j for i, j in __walk_landscape_with_gravity(state_clone)]
+    height_map = [j for i, j in walk_landscape_with_gravity(state_clone)]
 
     for i in range(state_clone.width):
         j = max_vertical
@@ -155,6 +155,26 @@ def score_from_gainful_lines(lines_per_player):
     return result
 
 
+def score_from_win(winner):
+    # type: (int) -> dict[int, float]
+    empiric_winner_score = 100000.0
+    result = {
+        RED: 0.0,
+        YELLOW: 0.0,
+    }
+    if not winner:
+        return result
+    result[winner] = empiric_winner_score
+    return result
+
+
+def combined_terminal(board, expected_in_line):
+    # type: (Board, int) -> dict[int, float]
+    win_state = winner(board, expected_in_line)
+    if win_state:
+        return score_from_win(win_state)
+    return score_from_gainful_lines(gainful_lines(board, expected_in_line))
+
 def __test_walk_landscape():
     data = [
         1, 2, 1, 1,
@@ -163,7 +183,7 @@ def __test_walk_landscape():
     ]
     m = FlatMatrix(4, 3, data)
     print m
-    for i, j in __walk_landscape_with_gravity(m):
+    for i, j in walk_landscape_with_gravity(m):
         print i, j
 
 
@@ -186,6 +206,20 @@ def __test_win_state():
     v1 = winner(b, 3)
     print v1
 
+def __test_win_state_2():
+    data = [
+        1,1,1,0,1,0,3,
+        0,0,3,0,0,0,3,
+        0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,
+        0,0,0,0,0,0,0,
+    ]
+    m = FlatMatrix(7,6, data)
+    print m
+    b = Board(6,7,m)
+    v1 = winner(b,4)
+    print v1
 
 def __text_gainful_lines():
     data1 = [
@@ -206,4 +240,5 @@ def __text_gainful_lines():
 if __name__ == '__main__':
     # __test_walk_landscape()
     # __test_win_state()
-    __text_gainful_lines()
+    # __text_gainful_lines()
+    __test_win_state_2()

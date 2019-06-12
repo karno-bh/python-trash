@@ -1,36 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from game import FlatMatrix
-
-
-class Game(object):
-
-    def __init__(self):
-        print "Constructing a Game Class"
-
-    def run(self):
-        print "Running Game"
-
-
-def main():
-    m_ex = FlatMatrix(3,4)
-    print m_ex
-    m_ex.set(1,1,2)
-    print m_ex
-    game = Game()
-    game.run()
-
-
-def test(t):
-    if t is True:
-        return 'Hello'
-    return -1
-
-
-def test_of_test():
-    j = test(False)
+from game import game
+from game import players
+from game import board
+from game import terminals
 
 
 if __name__ == '__main__':
-    main()
+    expected_in_line = 4
+    depth = 3
+    players = [players.ConsolePlayer(board.RED), players.MiniMaxPlayer(board.YELLOW, terminals.combined_terminal, depth, expected_in_line)]
+    game.game(players, expected_in_line)

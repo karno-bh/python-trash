@@ -35,6 +35,12 @@ def invert_direction(direction):
     return -direction[0], -direction[1]
 
 
+def opponent(color):
+    # type: (int) -> int
+    if color == RED:
+        return YELLOW
+    return RED
+
 class Board(object):
 
     def __init__(self, width=7, height=6, state=None):
@@ -44,7 +50,7 @@ class Board(object):
 
     def move(self, x, color, perform=True):
         state = self.state
-        if x < state.height and state.get(x, state.height - 1) == EMPTY:
+        if x >= 0 and x < state.width and state.get(x, state.height - 1) == EMPTY:
             if perform:
                 y = state.height - 1
                 while state.get(x, y) == EMPTY and y >= 0:
@@ -58,6 +64,6 @@ class Board(object):
 __all__ = [
     'EMPTY', 'RED', 'YELLOW', 'COLOR_NAMES',
     'NO_MOVE', 'NORTH', 'EAST', 'SOUTH', 'WEST', 'NE', 'SE', 'SW', 'NW', 'DIRECTIONS_PAIRS',
-    'invert_direction',
+    'invert_direction', 'opponent',
     'Board',
 ]
