@@ -86,13 +86,11 @@ def gainful_lines(board, expected_in_line):
     Gainful line is a line that can grow till the maximal number of elements
     :rtype: Dict
     """
-    indicators_length = len(DIRECTIONS_PAIRS)
     state_clone = FlatMatrix(
         board.state.width,
         board.state.height,
         [x for x in board.state.data]
     )
-    max_horizontal = state_clone.width - 1
     max_vertical = state_clone.height - 1
     result = {
         RED: {},
@@ -241,7 +239,7 @@ def __text_gainful_lines():
     print from_gainful_lines_score
 
 
-def load_map(map):
+def __load_map(map):
     print map
     lines = 0
     rows = 0
@@ -292,7 +290,7 @@ def __test_win_state_3():
         - r y r y - -
         r r r y r - -
     """
-    m = load_map(map)
+    m = __load_map(map)
     b = Board(m.width, m.height, m)
     w = winner(b, 4)
     print w

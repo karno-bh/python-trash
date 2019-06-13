@@ -47,7 +47,6 @@ class MiniMaxPlayer(Player):
 
     def __score_map_to_score(self, score_map, depth):
         # type: (dict[int, float], int) -> float
-        # print "depth {0}".format(depth)
         if self.color == RED:
             score = score_map[RED] - score_map[YELLOW]
         else:
@@ -69,7 +68,6 @@ class MiniMaxPlayer(Player):
             return self.__score_map_to_score(heuristic, 0), parent_move
         playing_indexes = [x for x in range(board.state.width)]
         random.shuffle(playing_indexes)
-        # playing_indexes = [5,0,1,2,3,4,5,6,7,8,9]
         height_map = [x for x in walk_landscape_with_gravity(board.state)]
         max_player = playing_for == self.color
         ret_column = -1
@@ -93,7 +91,6 @@ class MiniMaxPlayer(Player):
                 beta = min(beta, val)
             if alpha > beta:
                 break
-        # print "Depth {0}, val {1}, ret_column {2}".format(current_depth, val, ret_column)
         return val, ret_column
 
 
