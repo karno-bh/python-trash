@@ -26,7 +26,8 @@ class MiniMaxPlayer(Player):
         self.expected_in_line = expected_in_line
 
     def move(self, board):  # type: (Board) -> int
-        return self.__min_max_move(board, self.color, float('-inf'), float('+inf'), 0, -1)[1]
+        min_max_move_score = self.__min_max_move(board, self.color, float('-inf'), float('+inf'), 0, -1)
+        return min_max_move_score[1]
 
     def __is_terminal(self, board, current_depth):
         # type: (Board, int) -> tuple[bool, int]
@@ -44,11 +45,17 @@ class MiniMaxPlayer(Player):
             return True, won_player
         return False, 0
 
-    def __score_map_to_score(self, score_map):
-        # type: (dict[int, float]) -> float
+    def __score_map_to_score(self, score_map, depth):
+        # type: (dict[int, float], int) -> float
+        # print "depth {0}".format(depth)
         if self.color == RED:
-            return score_map[RED] - score_map[YELLOW]
-        return score_map[YELLOW] - score_map[RED]
+            score = score_map[RED] - score_map[YELLOW]
+        else:
+            score = score_map[YELLOW] - score_map[RED]
+        depth_correction = 0 if depth == 0 else 1 / depth
+        if score > 0:
+            return score + depth_correction
+        return score - depth_correction
 
     def __min_max_move(self, board, playing_for, alpha, beta, current_depth, parent_move):
         # type: (Board, int, float, float, int, int) -> tuple[float, int]
@@ -57,11 +64,12 @@ class MiniMaxPlayer(Player):
             won_player = terminal_state[1]
             if won_player:
                 winner_score = score_from_win(won_player)
-                return self.__score_map_to_score(winner_score), parent_move
+                return self.__score_map_to_score(winner_score, current_depth), parent_move
             heuristic = self.game_terminal(board, self.expected_in_line)
-            return self.__score_map_to_score(heuristic), parent_move
+            return self.__score_map_to_score(heuristic, 0), parent_move
         playing_indexes = [x for x in range(board.state.width)]
         random.shuffle(playing_indexes)
+        # playing_indexes = [5,0,1,2,3,4,5,6,7,8,9]
         height_map = [x for x in walk_landscape_with_gravity(board.state)]
         max_player = playing_for == self.color
         ret_column = -1
@@ -85,6 +93,7 @@ class MiniMaxPlayer(Player):
                 beta = min(beta, val)
             if alpha > beta:
                 break
+        # print "Depth {0}, val {1}, ret_column {2}".format(current_depth, val, ret_column)
         return val, ret_column
 
 

@@ -31,10 +31,13 @@ def winner(board, expected_in_line):
             mask = 1 << directions_idx
             direction_already_checked = mask & start_val
             if direction_already_checked:
+                # print "checked debug"
                 continue
             directions = DIRECTIONS_PAIRS[directions_idx]
             collected_length = 1
-            state_clone.set(i, j, start_val << indicators_length | mask, clone=False)
+            # temp_val = start_val << indicators_length | mask
+            temp_val = start_val | mask
+            state_clone.set(i, j, temp_val, clone=False)
             for direction in directions:
                 run_i = i
                 run_j = j
@@ -50,7 +53,8 @@ def winner(board, expected_in_line):
                     if inspected_element & mask:
                         raise RuntimeError("Direction had to be checked in previous iterations")
                     collected_length += 1
-                    state_clone.set(run_i, run_j, inspected_element << indicators_length | mask, clone=False)
+                    # state_clone.set(run_i, run_j, inspected_element << indicators_length | mask, clone=False)
+                    state_clone.set(run_i, run_j, inspected_element | mask, clone=False)
                     if collected_length == expected_in_line:
                         return real_inspected_el_val
     return EMPTY
@@ -237,8 +241,67 @@ def __text_gainful_lines():
     print from_gainful_lines_score
 
 
+def load_map(map):
+    print map
+    lines = 0
+    rows = 0
+    first_line = True
+    acc = []
+    for line in map.splitlines():
+        line = line.strip()
+        if line:
+            lines += 1
+            row_vals = []
+            for row in line.split(" "):
+                row = row.strip()
+                if row:
+                    v = EMPTY
+                    if row == 'r':
+                        v = RED
+                    elif row == 'y':
+                        v = YELLOW
+                    row_vals.append(v)
+            if first_line:
+                rows = len(row_vals)
+            elif len(row_vals) != rows:
+                raise Exception('Number of rows not equal to first line')
+            acc += row_vals
+
+    m = FlatMatrix(rows, lines, acc)
+    print m
+
+    flip_m = FlatMatrix(rows, lines)
+    jj = 0
+    for j in range(lines - 1, -1, -1):
+        for i in  range(rows):
+            v = m.get(i, j)
+            flip_m.set(i, jj, v, clone=False)
+        jj += 1
+
+    print flip_m
+    return flip_m
+
+    pass
+
+def __test_win_state_3():
+    map = """
+        - - - - - - -
+        - - - r y - -
+        - r y y y - -
+        - y r y r - -
+        - r y r y - -
+        r r r y r - -
+    """
+    m = load_map(map)
+    b = Board(m.width, m.height, m)
+    w = winner(b, 4)
+    print w
+
+
 if __name__ == '__main__':
     # __test_walk_landscape()
     # __test_win_state()
     # __text_gainful_lines()
-    __test_win_state_2()
+    # __test_win_state_2()
+    # __load_map()
+    __test_win_state_3()

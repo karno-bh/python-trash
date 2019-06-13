@@ -41,6 +41,7 @@ def opponent(color):
         return YELLOW
     return RED
 
+
 class Board(object):
 
     def __init__(self, width=7, height=6, state=None):
@@ -50,7 +51,7 @@ class Board(object):
 
     def move(self, x, color, perform=True):
         state = self.state
-        if x >= 0 and x < state.width and state.get(x, state.height - 1) == EMPTY:
+        if 0 <= x < state.width and state.get(x, state.height - 1) == EMPTY:
             if perform:
                 y = state.height - 1
                 while state.get(x, y) == EMPTY and y >= 0:
