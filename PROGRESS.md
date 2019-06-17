@@ -1,3 +1,25 @@
+# 2019-06-17
+## Short-Term To Do
+### Topics
+#### UI
+* Basic Window for the playing with ability to choose the board size and the length of checkers for the winning state.
+#### Documentation
+* Is it good decision to write documentation in markdown with the code itself?..
+## Done
+### Topics
+#### Computer opponent
+* Some design of how GUI game should look like: ![Image of how game looks](misc-files/InitialGameDesign.JPG)
+## Long-Term To Do
+### Topics
+#### UI
+* UI for the server mode with played games.
+#### Network
+* Design how the network playing will look like:
+    - Rooms? roles? waiting? etc.
+    - Should the server mode have persistent storage for players and roles?
+#### Documentation
+* Write a full explanation of the minimax terminal algorithms why and how it works
+
 # 2019-06-14
 ## Short-Term To Do
 ### Topics
