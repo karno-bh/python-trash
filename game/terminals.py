@@ -14,8 +14,8 @@ def walk_landscape_with_gravity(state):
     pass
 
 
-def winner(board, expected_in_line):
-    # type: (Board, int) -> int
+def winner(board, expected_in_line, return_coordinates=False):
+    # type: (Board, int, bool) -> int or tuple[int, list[list[int]]]
     indicators_length = len(DIRECTIONS_PAIRS)
     state_clone = FlatMatrix(
         board.state.width,
@@ -35,10 +35,13 @@ def winner(board, expected_in_line):
                 continue
             directions = DIRECTIONS_PAIRS[directions_idx]
             collected_length = 1
+            collected_nodes = None
+            if return_coordinates:
+                collected_nodes = [[i, j]]
             # temp_val = start_val << indicators_length | mask
             temp_val = start_val | mask
             state_clone.set(i, j, temp_val, clone=False)
-            for direction in directions:
+            for dir_num, direction in enumerate(directions):
                 run_i = i
                 run_j = j
                 while True:
@@ -53,11 +56,20 @@ def winner(board, expected_in_line):
                     if inspected_element & mask:
                         raise RuntimeError("Direction had to be checked in previous iterations")
                     collected_length += 1
+                    if return_coordinates:
+                        if dir_num == 0:
+                            collected_nodes.append([run_i, run_j])
+                        else:
+                            collected_nodes.insert(0,[run_i, run_j])
                     # state_clone.set(run_i, run_j, inspected_element << indicators_length | mask, clone=False)
                     state_clone.set(run_i, run_j, inspected_element | mask, clone=False)
                     if collected_length == expected_in_line:
-                        return real_inspected_el_val
-    return EMPTY
+                        if not return_coordinates:
+                            return real_inspected_el_val
+                        return real_inspected_el_val, collected_nodes
+    if not return_coordinates:
+        return EMPTY
+    return EMPTY, []
 
 
 def __score(i, j, expected_type, state, height_map, expected_in_line):
