@@ -54,5 +54,72 @@ class FlatMatrix(object):
             buf += "\n"
         return ''.join(buf)
 
+    def __mul__(self, other):
+        if isinstance(other, FlatMatrix):
+            if self.width != other.height:
+                raise Exception("Other instance is FlatMatrix but current matrix width != other matrix height")
+            result = FlatMatrix(self.height, other.width)
+            possible_zero = 0
+            if isinstance(self.data[0], float):
+                possible_zero = 0.0
+            for i in range(self.height):
+                for j in range(other.width):
+                    res_el = possible_zero
+                    for k in range(self.width):
+                        res_el += self.get(k, i) * other.get(j, k)
+                    result.set(i, j, res_el, clone=False)
+            return result
+        elif isinstance(other, list):
+            if self.width != len(other):
+                raise Exception("Other instance is list but current matrix width != other list length")
+            possible_zero = 0
+            if isinstance(self.data[0], float):
+                possible_zero = 0.0
+            # result = [possible_zero for t in range(self.height)]
+            result = []
+            for i in range(self.height):
+                res_el = possible_zero
+                for j in range(self.width):
+                    res_el += self.get(j, i) * other[j]
+                result.append(res_el)
+            return result
+
 
 __all__ = ['FlatMatrix']
+
+
+def __test_mul_matrix():
+    left_data = [
+        1., 2., 3., 4.,
+        5., 6., 7., 8.,
+    ]
+    left = FlatMatrix(4, 2, new_state=left_data)
+
+    right_data = [
+        1., 2.,
+        1., 2.,
+        1., 2.,
+        1., 2.,
+    ]
+    right = FlatMatrix(2, 4, new_state=right_data)
+
+    res = left * right
+
+    print res
+
+
+def __test_mul_vector():
+    left_data = [
+        1., 2., 3.,
+        4., 5., 6.,
+    ]
+    left = FlatMatrix(3, 2, new_state=left_data)
+    right = [2., 2., 2.]
+    result = left * right
+
+    print result
+
+
+if __name__ == '__main__':
+    __test_mul_matrix()
+    __test_mul_vector()

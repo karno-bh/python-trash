@@ -14,6 +14,24 @@ class ConsolePlayer(Player):
         return int(input("You are {0}, please select a column: ".format(color_name))) - 1
 
 
+class UIPlayer(Player):
+
+    def __init__(self, color, moving_callback):
+        super(UIPlayer, self).__init__(color)
+        self.moving_callback = moving_callback
+        self.my_state = 'waiting'
+
+    def move(self, board):
+        if self.my_state == 'waiting':
+            self.my_state = 'playing'
+            return -1
+        if self.my_state == 'playing':
+            column = self.moving_callback()
+            if column == -1:
+                return -1
+            self.my_state = 'waiting'
+            return column
+
 class MiniMaxPlayer(Player):
 
     def __init__(self, color, combined_terminal, depth, expected_in_line):

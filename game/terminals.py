@@ -239,7 +239,7 @@ def __text_gainful_lines():
     print from_gainful_lines_score
 
 
-def __load_map(map):
+def load_map(map):
     print map
     lines = 0
     rows = 0
@@ -290,7 +290,7 @@ def __test_win_state_3():
         - r y r y - -
         r r r y r - -
     """
-    m = __load_map(map)
+    m = load_map(map)
     b = Board(m.width, m.height, m)
     w = winner(b, 4)
     print w
