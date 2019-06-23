@@ -27,7 +27,7 @@ class UIPlayer(Player):
             return -1
         if self.my_state == 'playing':
             column = self.moving_callback()
-            if column == -1:
+            if column == -1 or board.state.get(column, board.state.height - 1) != EMPTY:
                 return -1
             self.my_state = 'waiting'
             return column
