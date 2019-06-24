@@ -45,6 +45,7 @@ class MiniMaxPlayer(Player):
 
     def move(self, board):  # type: (Board) -> int
         min_max_move_score = self.__min_max_move(board, self.color, float('-inf'), float('+inf'), 0, -1)
+        print "Min Max Score {}".format(min_max_move_score)
         return min_max_move_score[1]
 
     def __is_terminal(self, board, current_depth):

@@ -1,3 +1,28 @@
+# 2019-06-24
+## Short-Term To Do
+### Topics
+#### Opponent
+* Add minimax terminal that will give high scores to the lines which are (expected_line - 1) length and have open
+  ends on both sides (it's a pre-win situation, no matter how opponent will move, the next move is a win move).
+#### UI
+* Complete Forward/Backward functionality
+#### Documentation
+* Is it good decision to write documentation in markdown with the code itself?..
+## Done
+### Topics
+#### UI
+Done some basic UI without Forward/Backward 
+## Long-Term To Do
+### Topics
+#### UI
+* UI for the server mode with played games.
+#### Network
+* Design how the network playing will look like:
+    - Rooms? roles? waiting? etc.
+    - Should the server mode have persistent storage for players and roles?
+#### Documentation
+* Write a full explanation of the minimax terminal algorithms why and how it works
+
 # 2019-06-17
 ## Short-Term To Do
 ### Topics
@@ -7,7 +32,7 @@
 * Is it good decision to write documentation in markdown with the code itself?..
 ## Done
 ### Topics
-#### Computer opponent
+#### UI
 * Some design of how GUI game should look like: ![Image of how game looks](misc-files/InitialGameDesign.JPG)
 ## Long-Term To Do
 ### Topics
