@@ -157,6 +157,77 @@ def gainful_lines(board, expected_in_line):
     return result
 
 
+def super_lines(board, expected_in_line):
+    # type: (Board, int) -> dict[int, int]
+
+    indicators_length = len(DIRECTIONS_PAIRS) - 1
+    state_clone = FlatMatrix(
+        board.state.width,
+        board.state.height,
+        [x << indicators_length for x in board.state.data]
+    )
+
+    result = {
+        RED: 0,
+        YELLOW: 0,
+    }
+
+    checked_direction_pairs = DIRECTIONS_PAIRS[0:-1]  # North/South cannot be a super line
+
+    for i, j in walk_landscape_with_gravity(state_clone):
+        start_coord = [i, j+1]
+        if state_clone.out_of_range(*start_coord):
+            continue
+        for index, direction_pair in enumerate(checked_direction_pairs):
+            mask = 1 << index
+            for direction in direction_pair:
+                inspected_i = start_coord[0] + direction[0]
+                inspected_j = start_coord[1] + direction[1]
+                if state_clone.out_of_range(inspected_i, inspected_j):
+                    continue
+                element_val = state_clone.get(inspected_i, inspected_j)
+                real_element_val = element_val >> indicators_length
+                if real_element_val == EMPTY:
+                    continue
+                direction_already_checked = mask & element_val
+                if direction_already_checked:
+                    continue
+                line_length = 1
+                while True:
+                    inspected_i += direction[0]
+                    inspected_j += direction[1]
+                    if state_clone.out_of_range(inspected_i, inspected_j):
+                        break
+                    inspected_element = state_clone.get(inspected_i, inspected_j)
+                    real_inspected_el_val = inspected_element >> indicators_length
+                    if real_element_val != real_inspected_el_val:
+                        break
+                    line_length += 1
+                    state_clone.set(inspected_i, inspected_j, inspected_element | mask, clone=False)
+                    if line_length == expected_in_line - 1:
+                        last_possible_i = inspected_i + direction[0]
+                        last_possible_j = inspected_j + direction[1]
+                        if state_clone.out_of_range(last_possible_i, last_possible_j):
+                            break
+                        inspected_element = state_clone.get(last_possible_i, last_possible_j)
+                        real_inspected_el_val = inspected_element >> indicators_length
+                        if real_inspected_el_val != EMPTY:
+                            break
+                        result[real_element_val] += 1
+                if result[RED] or result[YELLOW]:
+                    return result
+    return result
+
+
+def score_from_super_line(super_lines_per_player):
+    # type: (dict[int, int]) -> dict[int, float]
+    empiric_super_line_score = 10000.0
+    result = {}
+    for player, super_lines_count in super_lines_per_player.items():
+        result[player] = float(super_lines_count) * empiric_super_line_score
+    return result
+
+
 def score_from_gainful_lines(lines_per_player):
     # type: (dict[int, dict[str, list[float]]]) -> dict[int, float]
     result = {}
@@ -187,6 +258,9 @@ def combined_terminal(board, expected_in_line):
     win_state = winner(board, expected_in_line)
     if win_state:
         return score_from_win(win_state)
+    super_lines_per_player = super_lines(board, expected_in_line)
+    if super_lines_per_player[RED] or super_lines_per_player[YELLOW]:
+        return score_from_super_line(super_lines_per_player)
     return score_from_gainful_lines(gainful_lines(board, expected_in_line))
 
 def __test_walk_landscape():
@@ -308,10 +382,25 @@ def __test_win_state_3():
     print w
 
 
+def __test_super_lines():
+    map = """
+    - - - - - - -
+    - - - - - - -
+    - - - - - - -
+    - - - y - - -
+    - - - y y - -
+    - - - r r r -
+    """
+    m = load_map(map)
+    b = Board(m.width, m.height, m)
+    s = super_lines(b, 4)
+    print s
+
 if __name__ == '__main__':
     # __test_walk_landscape()
     # __test_win_state()
     # __text_gainful_lines()
     # __test_win_state_2()
     # __load_map()
-    __test_win_state_3()
+    #__test_win_state_3()
+    __test_super_lines()

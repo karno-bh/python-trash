@@ -12,7 +12,42 @@ def game(players, expected_in_line, width=7, height=6):
         RED: 'r',
         YELLOW: 'y',
     }
-    board = Board(width, height)
+    # board = Board(width, height)
+    map00 = """
+    - - - - - - -
+    - - - - - - -
+    - - - r - - -
+    - - y y - - -
+    - r y y y - -
+    r r r y r - -
+    """
+    map01 = """
+    - - - - - - -
+    - - - - - - -
+    - - - - - - -
+    - - - y - - -
+    - - - y y - -
+    - - - r r - -
+    """
+    map02 = """
+    - - - r - - -
+    - r - y - - -
+    - y - r - - -
+    - r - y - - -
+    - y - r y - -
+    - r - y r y -
+    """
+    map03 = """
+    - - - r - - -
+    - r - y - - -
+    - y - r - - -
+    - r - y r - -
+    - y - r y - -
+    - r - y r y -
+    """
+    m = load_map(map02)
+    board = Board(m.width, m.height, m)
+    # board = Board()
     for step in count(0):
         print board.state.pretty_log(replace)
         win = winner(board, expected_in_line)

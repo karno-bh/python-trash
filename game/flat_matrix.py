@@ -34,7 +34,7 @@ class FlatMatrix(object):
     def out_of_range(self, i, j):
         max_horizontal = self.width - 1
         max_vertical = self.height - 1
-        return i < 0 or i > max_horizontal or j < 0 or j > max_vertical
+        return j < 0 or j > max_vertical or i < 0 or i > max_horizontal
 
     def __str__(self):
         buf = []

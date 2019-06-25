@@ -45,24 +45,27 @@ class MiniMaxPlayer(Player):
 
     def move(self, board):  # type: (Board) -> int
         min_max_move_score = self.__min_max_move(board, self.color, float('-inf'), float('+inf'), 0, -1)
-        print "Min Max Score {}".format(min_max_move_score)
+        # print "Min Max Score {}".format(min_max_move_score)
         return min_max_move_score[1]
 
     def __is_terminal(self, board, current_depth):
-        # type: (Board, int) -> tuple[bool, int]
+        # type: (Board, int) -> tuple[bool, int, dict or None]
         if current_depth == self.depth:
-            return True, 0
+            return True, 0, None
         has_move = False
         for i, j in walk_landscape_with_gravity(board.state):
             if j != board.state.height:
                 has_move = True
                 break
         if not has_move:
-            return True, 0
+            return True, 0, None
         won_player = winner(board, self.expected_in_line)
         if won_player:
-            return True, won_player
-        return False, 0
+            return True, won_player, None
+        super_lines_per_player = super_lines(board, self.expected_in_line)
+        if super_lines_per_player[opponent(self.color)]:
+            return True, 0, super_lines_per_player
+        return False, 0, None
 
     def __score_map_to_score(self, score_map, depth):
         # type: (dict[int, float], int) -> float
@@ -70,7 +73,7 @@ class MiniMaxPlayer(Player):
             score = score_map[RED] - score_map[YELLOW]
         else:
             score = score_map[YELLOW] - score_map[RED]
-        depth_correction = 0 if depth == 0 else 1 / depth
+        depth_correction = 0 if depth == 0 else 1 / float(depth)
         if score > 0:
             return score + depth_correction
         return score - depth_correction
@@ -83,21 +86,29 @@ class MiniMaxPlayer(Player):
             if won_player:
                 winner_score = score_from_win(won_player)
                 return self.__score_map_to_score(winner_score, current_depth), parent_move
+            super_lines_per_player = terminal_state[2]
+            if super_lines_per_player:
+                super_lines_score = score_from_super_line(super_lines_per_player)
+                return self.__score_map_to_score(super_lines_score, current_depth), parent_move
             heuristic = self.game_terminal(board, self.expected_in_line)
             return self.__score_map_to_score(heuristic, 0), parent_move
         playing_indexes = [x for x in range(board.state.width)]
-        random.shuffle(playing_indexes)
+        # random.shuffle(playing_indexes)
         height_map = [x for x in walk_landscape_with_gravity(board.state)]
         max_player = playing_for == self.color
         ret_column = -1
         val = float(max_player and '-inf' or '+inf')
         for index in playing_indexes:
+            # if current_depth == 0:
+            #     print "Depth = 0"
             column, row = height_map[index]
-            if row == board.state.height:
+            if row + 1 == board.state.height:
                 continue
             moved_state = board.move(column, playing_for)
             moved_board = Board(state=moved_state)
             child_score = self.__min_max_move(moved_board, opponent(playing_for), alpha, beta, current_depth + 1, column)[0]
+            # if current_depth == 0:
+            #     print child_score
             if max_player:
                 if child_score > val:
                     val = child_score

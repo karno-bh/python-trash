@@ -78,7 +78,7 @@ class Application(object):
         self.checked_depth_label.grid(row=4, column=0, sticky=W, pady=4, padx=4)
 
         self.checked_depth_spinner_var = StringVar()
-        self.checked_depth_spinner = Spinbox(self.game_settings_frame, from_=1, to=7, textvariable=self.checked_depth_spinner_var)
+        self.checked_depth_spinner = Spinbox(self.game_settings_frame, from_=2, to=7, textvariable=self.checked_depth_spinner_var)
         self.checked_depth_spinner_var.set("3")
         self.checked_depth_spinner.grid(row=4, column=1, columnspan=2, sticky=W+E)
 
@@ -185,19 +185,25 @@ class Application(object):
         if column == -1:
             return
         new_state = self.game_board.move(column, color)
+        # replace = {
+        #     board.EMPTY: '-',
+        #     board.RED: 'r',
+        #     board.YELLOW: 'y',
+        # }
+        # print new_state.pretty_log(replace)
         self.game_board = board.Board(state=new_state)
         win, coordinates = terminals.winner(self.game_board, self.game_state['expectedInLine'], return_coordinates=True)
 
         self.__draw_board()
         self.game_canvas.update()
         if win != board.EMPTY:
-            self.moves_list.insert(END, "{} played {} and won".format(board.COLOR_NAMES[win], column + 1))
+            self.moves_list.insert(END, "{} played on column {} and won".format(board.COLOR_NAMES[win], column + 1))
             self.game_state['winner'] = win
             self.game_state['winCoordinates'] = coordinates
             self.__draw_board()
             return
         else:
-            self.moves_list.insert(END, "{} played {}".format(board.COLOR_NAMES[color], column))
+            self.moves_list.insert(END, "{} played on column {}".format(board.COLOR_NAMES[color], column + 1))
         self.moves_list.see("end")
         # self.moves_list.select_set(self.moves_list.size() - 1, self.moves_list.size() - 1)
         self.game_state['gameStep'] += 1
