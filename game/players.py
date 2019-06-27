@@ -48,8 +48,8 @@ class MiniMaxPlayer(Player):
         # print "Min Max Score {}".format(min_max_move_score)
         return min_max_move_score[1]
 
-    def __is_terminal(self, board, current_depth):
-        # type: (Board, int) -> tuple[bool, int, dict or None]
+    def __is_terminal(self, board, current_depth, playing_for):
+        # type: (Board, int, int) -> tuple[bool, int, dict or None]
         if current_depth == self.depth:
             return True, 0, None
         has_move = False
@@ -62,9 +62,12 @@ class MiniMaxPlayer(Player):
         won_player = winner(board, self.expected_in_line)
         if won_player:
             return True, won_player, None
-        super_lines_per_player = super_lines(board, self.expected_in_line)
-        if super_lines_per_player[opponent(self.color)]:
-            return True, 0, super_lines_per_player
+        opponent_color = opponent(self.color)
+        if playing_for == self.color and current_depth != 0:
+            super_lines_per_player = super_lines(board, self.expected_in_line)
+            # print "super lines = {}".format(super_lines_per_player)
+            if super_lines_per_player[opponent_color]:
+                return True, 0, super_lines_per_player
         return False, 0, None
 
     def __score_map_to_score(self, score_map, depth):
@@ -80,7 +83,7 @@ class MiniMaxPlayer(Player):
 
     def __min_max_move(self, board, playing_for, alpha, beta, current_depth, parent_move):
         # type: (Board, int, float, float, int, int) -> tuple[float, int]
-        terminal_state = self.__is_terminal(board, current_depth)
+        terminal_state = self.__is_terminal(board, current_depth, playing_for)
         if terminal_state[0]:
             won_player = terminal_state[1]
             if won_player:
@@ -105,6 +108,7 @@ class MiniMaxPlayer(Player):
             if row + 1 == board.state.height:
                 continue
             moved_state = board.move(column, playing_for)
+            # print "Moved state:\n{}".format(moved_state)
             moved_board = Board(state=moved_state)
             child_score = self.__min_max_move(moved_board, opponent(playing_for), alpha, beta, current_depth + 1, column)[0]
             # if current_depth == 0:

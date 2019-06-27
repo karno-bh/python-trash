@@ -45,9 +45,17 @@ def game(players, expected_in_line, width=7, height=6):
     - y - r y - -
     - r - y r y -
     """
-    m = load_map(map02)
+    map04 = """
+    - r r y - r y
+    - y y r - y r
+    - y y y - r y
+    - y y y - y r
+    - r r r - r r
+    - r r y - y r
+    """
+    m = load_map(map04)
     board = Board(m.width, m.height, m)
-    # board = Board()
+    board = Board()
     for step in count(0):
         print board.state.pretty_log(replace)
         win = winner(board, expected_in_line)
@@ -80,4 +88,5 @@ if __name__ == '__main__':
     expected_in_line = 4
     depth = 3
     players = [ConsolePlayer(RED), MiniMaxPlayer(YELLOW, combined_terminal, depth, expected_in_line)]
+    # players = [ConsolePlayer(RED), ConsolePlayer(YELLOW)]
     game(players, expected_in_line, width=7, height=6)

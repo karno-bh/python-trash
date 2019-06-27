@@ -211,9 +211,17 @@ def super_lines(board, expected_in_line):
                             break
                         inspected_element = state_clone.get(last_possible_i, last_possible_j)
                         real_inspected_el_val = inspected_element >> indicators_length
-                        if real_inspected_el_val != EMPTY:
-                            break
-                        result[real_element_val] += 1
+
+                        if real_inspected_el_val == EMPTY:
+                            last_possible_j -= 1
+                            if state_clone.out_of_range(last_possible_i, last_possible_j):
+                                result[real_element_val] += 1
+                            else:
+                                inspected_element = state_clone.get(last_possible_i, last_possible_j)
+                                real_inspected_el_val = inspected_element >> indicators_length
+                                if real_inspected_el_val != EMPTY:
+                                    result[real_element_val] += 1
+                        break
                 if result[RED] or result[YELLOW]:
                     return result
     return result
